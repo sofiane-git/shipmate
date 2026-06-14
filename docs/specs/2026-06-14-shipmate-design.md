@@ -360,6 +360,8 @@ shipmate/
 ├── examples/
 │   ├── js-single-contract/       # fixture + demo
 │   └── python-single-contract/   # fixture + demo
+├── hooks/
+│   └── pre-commit                 # native bash dev hook (shellcheck/ajv/frontmatter); core.hooksPath, no husky
 ├── .github/workflows/ci.yml
 ├── docs/
 │   ├── specs/2026-06-14-shipmate-design.md
@@ -401,7 +403,16 @@ Requirements:
 - **Skill evals** (via skill-creator) using the `examples/` repos as fixtures: a fixture
   repo in → expected `.shipmate.json` / expected bump decision out.
 - **CI (`ci.yml`)**: `shellcheck` all scripts, validate `shipmate-config.schema.json`,
-  lint SKILL.md frontmatter, run bats + fixtures. Pin any action by commit SHA.
+  lint SKILL.md frontmatter, run bats + fixtures. Pin any action by commit SHA. **CI is
+  the barrier** (required status checks); the pre-commit hook below is convenience only.
+- **Dev pre-commit hook — native bash, no husky.** A committed `hooks/pre-commit` runs a
+  fast subset of CI locally (`shellcheck`, `ajv` schema validation, frontmatter lint),
+  wired via `git config core.hooksPath hooks` in a one-line setup script. **No husky / no
+  `lint-staged` / no `node_modules`**: shipmate is a bash + markdown + JSON repo, husky is
+  a JS-app tool and would contradict the lightweight, dependency-light ethos — and shipmate
+  already scaffolds plain bash hooks for consumers, so its own repo dogfoods the same
+  mechanism. The hook is opt-in for contributors and documented in `CONTRIBUTING.md`; it
+  speeds feedback but never replaces CI.
 - `examples/` double as fixtures and as documentation/demos.
 - **Acceptance criteria** (I6): per-skill, testable "definition of done" lives in the
   **implementation plan** (writing-plans step), not this spec — keeping the spec at the
