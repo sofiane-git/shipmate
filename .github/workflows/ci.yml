@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: shellcheck
-        run: shellcheck scripts/*.sh hooks/pre-commit setup-dev.sh
+        run: shellcheck scripts/*.sh templates/*.sh hooks/pre-commit setup-dev.sh
 
   schema:
     runs-on: ubuntu-latest
@@ -23,8 +23,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: validate schema + fixture
-        run: npx -y ajv-cli@5.0.0 validate --spec=draft2020 -s schemas/shipmate-config.schema.json -d examples/config-valid.json
+      - name: validate schema + fixtures
+        run: |
+          npx -y ajv-cli@5.0.0 validate --spec=draft2020 -s schemas/shipmate-config.schema.json -d examples/config-valid.json
+          for f in examples/*/expected.shipmate.json; do
+            npx -y ajv-cli@5.0.0 validate --spec=draft2020 -s schemas/shipmate-config.schema.json -d "$f"
+          done
 
   bats:
     runs-on: ubuntu-latest

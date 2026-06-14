@@ -45,6 +45,8 @@ For `protectedBranch`, offer each layer separately (templates `protect-main.sh`,
 `changelog-skeleton.md` if absent.
 
 ## Hard rules
-- shipmate never edits source code. You only write `.shipmate.json`, scaffolded
-  hooks/CI/templates, and (if absent) a CHANGELOG skeleton.
+- shipmate writes only what the config declares: `.shipmate.json`, scaffolded
+  hooks/CI/templates, and (if absent) a CHANGELOG skeleton. It does not discover or edit
+  source code on its own. Version locations are validated repo-relative (no absolute paths,
+  no `..`, no symlink escape).
 - Always preview before writing; always confirm before scaffolding.
