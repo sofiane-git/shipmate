@@ -1,13 +1,25 @@
 {
   "name": "shipmate",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Cut software releases from Claude Code: curated changelog, nuanced SemVer, multi-version repos. Local-first, no Conventional Commits required.",
   "license": "MIT",
-  "repository": { "type": "git", "url": "https://github.com/sofiane-git/shipmate.git" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sofiane-git/shipmate.git"
+  },
   "scripts": {
     "validate:schema": "npx -y ajv-cli@5.0.0 validate --spec=draft2020 -s schemas/shipmate-config.schema.json -d examples/config-valid.json",
     "test": "bats tests"
   },
-  "keywords": ["claude-code", "claude-plugin", "release-automation", "changelog", "semver", "versioning"],
-  "engines": { "node": ">=18" }
+  "keywords": [
+    "claude-code",
+    "claude-plugin",
+    "release-automation",
+    "changelog",
+    "semver",
+    "versioning"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
 }
