@@ -1,7 +1,9 @@
 # Quickstart
 
 This guide takes you from zero to your first shipmate release. No prior knowledge of
-release tooling needed. New terms are defined the first time they appear.
+release tooling needed. New terms are defined the first time they appear — and every
+technical term shipmate uses (tag, release, contract, SemVer, drift, …) has a full
+plain-language entry in the [Glossary](./glossary.md).
 
 ## 1. Install the plugin
 Install the `shipmate` plugin in Claude Code (marketplace install). Then open your repo.

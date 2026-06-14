@@ -9,7 +9,7 @@
       "name": "shipmate",
       "source": "./",
       "description": "Cut software releases from Claude Code: curated changelog, nuanced SemVer, multi-version repos. Local-first, no Conventional Commits required.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "author": {
         "name": "Sofiane Conan"
       },

@@ -23,6 +23,9 @@ and Python repos.
 ## Quick start
 See **[docs/quickstart.md](docs/quickstart.md)** — install → `init` → first `release`, step by step.
 
+## New to release tooling?
+See **[docs/glossary.md](docs/glossary.md)** — every technical term (tag, release, contract, SemVer, drift, …) defined in plain language for newcomers.
+
 ## How it compares
 See **[docs/positioning.md](docs/positioning.md)** — an honest comparison with release-please, changesets, and semantic-release, including when *not* to use shipmate.
 
