@@ -1,5 +1,8 @@
 # shipmate v0 — Plan 3: `release` skill Implementation Plan
 
+> ❄️ **FROZEN.** Executed and merged. This plan is an archival build record, not kept in
+> sync with the code. The shipped behavior lives in the code/tests; do not patch this file.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans. Steps use checkbox (`- [ ]`) syntax. Depends on Plans 1–2 (read-version, version-sync-check, validate-config, the config).
 
 **Goal:** Build the `shipmate:release` skill — the state machine that bumps versions, authors the curated changelog, runs the pre-flight + pre-publish guards, and (after one human checkpoint) tags and publishes — plus the deterministic WRITE-side scripts it orchestrates.

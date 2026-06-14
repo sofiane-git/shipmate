@@ -1,5 +1,8 @@
 # shipmate v0 — Plan 4: verify + docs + dogfood Implementation Plan
 
+> ❄️ **FROZEN** once merged. Archival build record, not kept in sync with the code.
+> The shipped behavior lives in the code/tests; do not patch this file post-merge.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans. Steps use checkbox (`- [ ]`) syntax. Depends on Plans 1–3 (all scripts + init + release).
 
 **Goal:** Ship the `shipmate:verify` doctor, the beginner-first + SEO documentation set, and prove the whole system by dogfooding it on `explain-panel-skills` (the two-contract case) and on shipmate itself.

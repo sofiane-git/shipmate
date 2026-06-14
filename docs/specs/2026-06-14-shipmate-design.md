@@ -1,7 +1,11 @@
 # shipmate — design spec
 
 - **Date:** 2026-06-14
-- **Status:** approved (brainstorming), pending implementation plan
+- **Status:** ❄️ **FROZEN design record.** v0 is built and shipped. This document captures
+  the *why* (decisions, trade-offs) at design time and is **not** kept in sync with the
+  code. **Current behavior lives in the code, tests, `README.md`, `CHANGELOG.md`, and the
+  `skills/*/SKILL.md` files** — if this doc and the code disagree, the code wins. Do not
+  patch this file for implementation changes; write a new dated design note instead.
 - **Author:** Sofiane Conan
 
 ## 1. Summary

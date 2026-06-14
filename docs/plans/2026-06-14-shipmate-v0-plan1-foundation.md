@@ -1,5 +1,8 @@
 # shipmate v0 — Plan 1: Foundation Implementation Plan
 
+> ❄️ **FROZEN.** Executed and merged. This plan is an archival build record, not kept in
+> sync with the code. The shipped behavior lives in the code/tests; do not patch this file.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build the tested, CI-green deterministic foundation of shipmate — the plugin scaffold, the `.shipmate.json` JSON Schema, and the five guard scripts that `release` will later orchestrate — with bats unit tests and a green CI, before any skill exists.
