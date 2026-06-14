@@ -13,7 +13,8 @@ independent version. It then performs the mechanical work (bump version literals
 GitHub release) itself, **local-first**, behind a single human checkpoint (§4).
 
 It is distributed as a plugin (like a normal Claude Code marketplace plugin) and is
-installed once, then used on any consuming repo via two skills plus a doctor command.
+installed once, then used on any consuming repo via three skills — `init`, `release`, and
+`verify` (a read-only drift doctor).
 
 ## 2. Why this exists / positioning
 
@@ -48,7 +49,8 @@ repo and after a separate search for higher-value gaps.
   for the "local-first" framing.)
 - **No monorepo / multi-package matrix in v0.** Single-package repos plus the
   multi-*contract* case only. Monorepo support is a documented extension point (§13).
-- **No `npm publish` (or other registry publish) unless a repo opts in.**
+- **No `npm publish` (or other registry publish) in v0.** A future opt-in per-contract
+  publish step is a documented extension (§13), not part of v0.
 - **No dependency on release-please.** shipmate is standalone. (Rationale in §4.)
 - **shipmate never edits source code.** It writes only: version literals (in the declared
   contract locations), `CHANGELOG.md`, and — at `init` only — generated config/hooks. It
@@ -146,7 +148,8 @@ simple single-version repo; N contracts = the multi-version case. Everything els
   very first config existing before any shipmate release. (m1)
 - **`primaryContract`** — names the contract whose tag defines "the last release" for the
   diff in `release` (§7.2). Removes ambiguity when several contracts (or `tag: null`
-  contracts) exist. (m2)
+  contracts) exist. Must reference a **tagged** contract (`tag` ≠ null) — there is no
+  "last tag" to diff from otherwise; `init` validates this. (m2)
 - **`locations[].json` / `.toml` / `.regex`** — how to read/write the literal.
   - `json` = JSONPath, `toml` = dotted key.
   - `regex` must contain **exactly one capture group**, and that group's span is the
@@ -187,10 +190,11 @@ contract currently agree on the same version.
    carry in CI. It is a first-class, documented `init` step, not an afterthought.
 6. **Offer branch-protection (three layers, each opt-in)** for `protectedBranch` —
    defense in depth, mirroring the explain-panel-skills setup (§8.1):
-   - a **local `protect-main` hook** (denies direct commit/push to the protected branch),
-   - **GitHub branch protection** configured via `gh api` (server-side gate),
-   - a **CI check** that rejects direct pushes.
-   Also scaffold an OSS-standard `CHANGELOG.md` skeleton if absent.
+   - a **local `protect-main` hook** (denies direct commit/push — convenience, bypassable),
+   - **GitHub branch protection** via `gh api` (server-side gate — the real barrier),
+   - **required status checks** (CI gates the PR merge; it does not block a push).
+   See §8.1 for which layer actually enforces. Also scaffold an OSS-standard
+   `CHANGELOG.md` skeleton if absent.
 7. **Idempotent re-run:** never blind-overwrite. Diff against existing `.shipmate.json`
    and merge, surfacing changes for confirmation.
 
@@ -232,7 +236,8 @@ state up to — but not including — `PUBLISH`, printing the full plan and writ
      └──────┬──────┘         └──────┬──────┘
             └───────────┬───────────┘
                  ┌──────▼──────┐
-                 │  CHECKPOINT │  single gate: full recap (bumps, changelog section,
+                 │  CHECKPOINT │  pre-PUBLISH secret-scan on the authored notes; then a
+                 │             │  single gate: full recap (bumps, changelog section,
                  │             │  tag plan, remote, branch). One explicit go/no-go
                  │             │  BEFORE the first irreversible action.
                  └──────┬──────┘
@@ -244,7 +249,8 @@ state up to — but not including — `PUBLISH`, printing the full plan and writ
                  └─────────────┘
 ```
 
-**PRE-FLIGHT guards** (deterministic scripts, always on, cannot be reasoned past — M2):
+**PRE-FLIGHT guards** (deterministic scripts, always on, cannot be reasoned past — M2).
+These depend on nothing the run authors, so they execute first:
 
 - **Preconditions** (`check-preconditions.sh`, M3): working tree clean, branch up to date
   with its base, `gh` authenticated, remote reachable. Abort on any failure.
@@ -254,8 +260,13 @@ state up to — but not including — `PUBLISH`, printing the full plan and writ
   `.shipmate.json` before any push.
 - **Version-sync** (`version-sync-check.sh`): all locations of each contract currently
   agree, before any bump.
-- **Secret scan** (`scan-secrets.sh`): the changelog section that will become release
-  notes is scanned for secret-shaped strings before it can be published.
+
+**Pre-PUBLISH guard** — runs after the notes are authored, before the first irreversible
+action (still satisfies M2: nothing irreversible has happened yet):
+
+- **Secret scan** (`scan-secrets.sh`): the curated CHANGELOG section that will become the
+  release notes is scanned for secret-shaped strings. It cannot run in PRE-FLIGHT because
+  the section does not exist until PLAN authors it; it runs at CHECKPOINT, gating PUBLISH.
 
 **Security review — secure by default** (`securityReview` policy, §6): at PLAN, shipmate
 **reuses the existing `/security-review` skill** on the diff since the last tag — it does
@@ -274,11 +285,19 @@ security-review tooling for consuming repos (their choice).
 `protectedBranch`; it works on a `release/*` branch, and only the **tag** is pushed
 directly after merge (tags are exempt from branch protection — see §8.1).
 
+**Reversibility ladder.** In PR mode the human merges the release PR *before* CHECKPOINT,
+so the version bump reaches `protectedBranch` before the go/no-go. That is deliberate: a
+merge is **revertible** (`git revert` / revert the PR), whereas the git tag and GitHub
+release are **policy-immutable**. CHECKPOINT therefore gates only the immutable artifacts;
+its recap states plainly that the PR is already merged and it is confirming **tag +
+release** on the merged commit. A no-go here cleans up the (un-pushed) tag and, if the
+maintainer wants, guides a revert of the merge.
+
 **Rollback / abort** (M4): `release` journals each completed step. On a guard failure, a
 no-go at CHECKPOINT, or an error mid-flight, it offers a cleanup matched to how far it got
-— delete the local tag, reset/delete the `release/*` branch, restore `CHANGELOG.md`.
-Nothing before `PUBLISH` is irreversible; `PUBLISH` itself is ordered last precisely so a
-failure cannot leave a half-published release.
+— delete the local tag, reset/delete the `release/*` branch, restore `CHANGELOG.md`, or
+guide a revert of a merged PR. The git tag and GitHub release (the only policy-immutable
+artifacts) are ordered last precisely so a failure cannot leave a half-published release.
 
 ### 7.3 `verify` — drift doctor
 
@@ -487,8 +506,8 @@ locations); JS/TS + Python discovery; curated changelog ownership incl. multi-co
 model; `release` state machine with PR mode + `--no-pr` + `--dry-run` + `--bump <name>` +
 secure-by-default security review (`securityReview: auto`, reuses `/security-review`,
 advisory, code-aware skip);
-PRE-FLIGHT guards (preconditions, tag-unpushed, remote, version-sync, secret-scan);
-journalled rollback; three-layer branch protection; drift guard wired as opt-in pre-push
+PRE-FLIGHT guards (preconditions, tag-unpushed, remote, version-sync) + pre-PUBLISH
+secret-scan; journalled rollback; three-layer branch protection; drift guard wired as opt-in pre-push
 hook and/or CI snippet; **beginner-first docs (quickstart + commented walkthrough)**;
 bats + eval + CI; two example fixtures; dogfood on explain-panel-skills.
 
