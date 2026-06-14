@@ -439,6 +439,15 @@ Requirements:
 - **`docs/languages/{js,python}.md`** — copy-pasteable setup per language.
 - **`docs/positioning.md`** — honest comparison vs release-please / changesets, so a
   reader can tell when *not* to use shipmate.
+- **SEO is a docs requirement, not an afterthought.** The `README.md` H1 and opening
+  paragraphs carry the most search weight, so they must be keyword-rich and front-loaded
+  (e.g. "Claude Code release plugin", "curated changelog", "SemVer", "multi-version /
+  multi-contract", "release automation"). Keep them aligned with the GitHub repo
+  description and topics (`claude-code`, `claude-plugin`, `release-automation`, `changelog`,
+  `semver`, `versioning`, …). `docs/positioning.md` doubles as long-tail SEO (search terms
+  like "release-please alternative", "curated changelog tool"). The repo stays **public**
+  for indexing. Brand name (`shipmate`) is the identity; discoverability rides on the
+  description, topics, README, and positioning page.
 
 ## 11. Testing strategy
 
