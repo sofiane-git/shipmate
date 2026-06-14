@@ -5,4 +5,19 @@ All notable changes to this project will be documented here. Format follows [Kee
 ## [Unreleased]
 
 ### Added
-- Foundation: plugin scaffold, `.shipmate.json` schema, deterministic guard scripts, bats tests, CI.
+- **Foundation**: plugin scaffold, `.shipmate.json` schema, deterministic guard scripts
+  (`read-version`, `version-sync-check`, `check-tag-unpushed`, `verify-remote`,
+  `check-preconditions`, `scan-secrets`), bats tests, CI (shellcheck + schema + bats +
+  frontmatter).
+- **`shipmate:init`** skill + `discover-versions.sh`, `validate-config.sh`, scaffolding
+  templates (3-layer branch protection + drift guard), js/python fixtures.
+- **`shipmate:release`** skill (state machine) + WRITE scripts (`write-version`,
+  `render-tag`, `changelog-release`, `diff-touches-code`, `release-rollback`).
+- **`shipmate:verify`** skill (read-only drift doctor).
+- **Docs**: SEO README, beginner-first quickstart, per-language guides, honest positioning
+  page, CONTRIBUTING, SECURITY.
+- shipmate's own `.shipmate.json` (self-dogfood).
+
+### Notes
+- Two-contract flow validated against the real `explain-panel-skills` repo (kit over four
+  locations + a `tag: null` schema contract).
