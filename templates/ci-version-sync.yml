@@ -1,0 +1,12 @@
+# Paste into .github/workflows/ — fails a PR if version locations drift.
+name: version-sync
+on: [pull_request]
+permissions:
+  contents: read
+jobs:
+  version-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: check version sync
+        run: bash .shipmate/version-sync-check.sh .shipmate.json
