@@ -1,5 +1,8 @@
 # shipmate v0 — Plan 3: `release` skill Implementation Plan
 
+> ❄️ **FROZEN.** Executed and merged. This plan is an archival build record, not kept in
+> sync with the code. The shipped behavior lives in the code/tests; do not patch this file.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans. Steps use checkbox (`- [ ]`) syntax. Depends on Plans 1–2 (read-version, version-sync-check, validate-config, the config).
 
 **Goal:** Build the `shipmate:release` skill — the state machine that bumps versions, authors the curated changelog, runs the pre-flight + pre-publish guards, and (after one human checkpoint) tags and publishes — plus the deterministic WRITE-side scripts it orchestrates.
@@ -491,7 +494,11 @@ Run, in order, aborting on the first failure:
 4. `version-sync-check.sh .shipmate.json`.
 
 ## State 2 — PLAN (no writes)
-- Determine the diff since the **primaryContract**'s last tag.
+- Determine the diff since the **primaryContract**'s last tag. **If no tag exists yet (a
+  repo's first-ever release), fall back to the diff from the repository's initial commit**
+  (`git rev-list --max-parents=0 HEAD`). The curated `[Unreleased]` drives the notes either
+  way. (Distinct from shipmate's own chicken/egg — consuming repos always have shipmate
+  available; they just lack a prior tag on first release.)
 - Classify the SemVer bump **per contract** using documented nuance (e.g. tightening an
   already-documented contract = PATCH, not MAJOR). Skip `bumpFrom: "manual"` contracts
   unless `--bump <name>` was passed. Present the proposed version(s) + reasoning.

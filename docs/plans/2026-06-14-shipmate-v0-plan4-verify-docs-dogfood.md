@@ -1,5 +1,8 @@
 # shipmate v0 — Plan 4: verify + docs + dogfood Implementation Plan
 
+> ❄️ **FROZEN** once merged. Archival build record, not kept in sync with the code.
+> The shipped behavior lives in the code/tests; do not patch this file post-merge.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans. Steps use checkbox (`- [ ]`) syntax. Depends on Plans 1–3 (all scripts + init + release).
 
 **Goal:** Ship the `shipmate:verify` doctor, the beginner-first + SEO documentation set, and prove the whole system by dogfooding it on `explain-panel-skills` (the two-contract case) and on shipmate itself.
@@ -406,10 +409,12 @@ Run `shipmate:init` in `~/dev/shipmate`. Expected contract `kit` over `package.j
 (`.version`), `.claude-plugin/plugin.json` (`.version`), `.claude-plugin/marketplace.json`
 (`.plugins[0].version`). Commit via PR.
 
-- [ ] **Step 2: Bootstrap the first tag manually (chicken/egg)**
+- [ ] **Step 2: Bootstrap the first tag manually (chicken/egg — shipmate only)**
 
-The first release cannot be cut by an unreleased shipmate. Set all three manifests to
-`0.1.0`, finalize `CHANGELOG.md` `[0.1.0]`, then:
+The first release cannot be cut by an unreleased shipmate. **This is specific to shipmate
+releasing itself** — consuming repos never hit it (shipmate is already installed when they
+use it; their first release just diffs from the initial commit, see Plan 3 State 2). Set
+all three manifests to `0.1.0`, finalize `CHANGELOG.md` `[0.1.0]`, then:
 ```bash
 git checkout -b release/v0.1.0
 # (bump manifests + changelog already done)

@@ -1,5 +1,8 @@
 # shipmate v0 — Plan 2: `init` skill Implementation Plan
 
+> ❄️ **FROZEN.** Executed and merged. This plan is an archival build record, not kept in
+> sync with the code. The shipped behavior lives in the code/tests; do not patch this file.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans. Steps use checkbox (`- [ ]`) syntax. Depends on Plan 1 (schema + `read-version.sh` must exist).
 
 **Goal:** Build the `shipmate:init` skill that onboards any JS/TS or Python repo — discovers version locations, proposes a contract map, validates it, writes `.shipmate.json`, and offers the drift-guard + branch-protection scaffolding.
