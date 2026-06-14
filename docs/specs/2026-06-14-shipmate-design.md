@@ -117,6 +117,7 @@ simple single-version repo; N contracts = the multi-version case. Everything els
   "remote": "origin",
   "protectedBranch": "main",
   "primaryContract": "kit",
+  "securityReview": "auto",
   "contracts": [
     {
       "name": "kit",
@@ -158,6 +159,10 @@ simple single-version repo; N contracts = the multi-version case. Everything els
 - **`bumpFrom: "changelog"`** — version decided from the curated changelog +
   diff (LLM judgment). **`"manual"`** — never auto-bumped by `release`; only moves when
   explicitly requested via `release --bump <name>` (§7.2). (M1)
+- **`securityReview`** — pre-publish review policy: `"auto"` (default — run
+  `/security-review` when the release diff touches code, skip code-less releases),
+  `"always"`, or `"off"`. Overridable per-invocation by `--security-review` /
+  `--no-security-review` (§7.2).
 
 `shipmate-config.schema.json` validates this file; `verify` checks all locations of a
 contract currently agree on the same version.
@@ -207,7 +212,9 @@ state up to — but not including — `PUBLISH`, printing the full plan and writ
                  ┌──────▼──────┐
                  │   PLAN      │  diff since primaryContract's last tag (m2);
                  │             │  classify SemVer per contract (skip bumpFrom:manual
-                 │             │  unless --bump <name>, M1); author curated CHANGELOG
+                 │             │  unless --bump <name>, M1); author curated CHANGELOG;
+                 │             │  security review per policy (auto: run /security-review
+                 │             │  when diff touches code), findings surfaced at CHECKPOINT
                  └──────┬──────┘
                         │ user sees plan  ── --dry-run stops here ──►
                  ┌──────▼──────┐
@@ -249,6 +256,19 @@ state up to — but not including — `PUBLISH`, printing the full plan and writ
   agree, before any bump.
 - **Secret scan** (`scan-secrets.sh`): the changelog section that will become release
   notes is scanned for secret-shaped strings before it can be published.
+
+**Security review — secure by default** (`securityReview` policy, §6): at PLAN, shipmate
+**reuses the existing `/security-review` skill** on the diff since the last tag — it does
+not reimplement scanning. The default policy is **`auto`**: the review runs whenever the
+release diff **touches code**, and is **skipped silently for code-less releases**
+(docs / changelog / version-bump only) so trivial releases pay nothing — which avoids
+training the maintainer to disable it reflexively. Policy is `auto` | `always` | `off` in
+`.shipmate.json`, overridable per run with `--security-review` / `--no-security-review`.
+Findings are **advisory**, surfaced to the human at CHECKPOINT before the go/no-go; they
+do not hard-block. This complements the deterministic `scan-secrets.sh` (narrow) with a
+broader LLM review at the natural pre-publish moment. Scope boundary: shipmate stays a
+release tool — it does not become a code-review product, and it does **not** generate
+security-review tooling for consuming repos (their choice).
 
 **Branch discipline** (M2/Q1): in PR mode `release` never commits or tags directly on
 `protectedBranch`; it works on a `release/*` branch, and only the **tag** is pushed
@@ -302,6 +322,10 @@ The repo keeps **one** `CHANGELOG.md`, owned by shipmate:
   repo root.
 - **Preconditions** before any release work (clean tree, up to date, `gh` auth, remote
   reachable) — `check-preconditions.sh`.
+- **Pre-publish security review — secure by default** — `securityReview: auto` runs the
+  `/security-review` skill on the release diff whenever it touches code (skips code-less
+  releases); `always`/`off` + `--security-review`/`--no-security-review` override.
+  Advisory, surfaced at CHECKPOINT (§7.2).
 - Trust boundary: SKILL prose can propose; only the deterministic scripts perform
   irreversible actions, and each has a guard that can hard-fail.
 
@@ -437,6 +461,9 @@ manually (chicken/egg).
 branch protection references them as required-to-merge. This bootstrap belongs in the
 implementation plan, performed once when the GitHub remote is created.
 
+shipmate's own PRs run `/security-review` before merge (documented in `CONTRIBUTING.md`) —
+dogfooding the opt-in review it exposes via `release --security-review`.
+
 ## 13. Extension points (not built in v0)
 
 - **Monorepo / multi-package.** If a future repo needs per-package independent versioning
@@ -451,7 +478,9 @@ implementation plan, performed once when the GitHub remote is created.
 In: standalone plugin (`shipmate:init` / `:release` / `:verify`); `.shipmate.json` with N
 contracts (`primaryContract`, `{name}`/`{version}` tag templates, single-capture regex
 locations); JS/TS + Python discovery; curated changelog ownership incl. multi-contract
-model; `release` state machine with PR mode + `--no-pr` + `--dry-run` + `--bump <name>`;
+model; `release` state machine with PR mode + `--no-pr` + `--dry-run` + `--bump <name>` +
+secure-by-default security review (`securityReview: auto`, reuses `/security-review`,
+advisory, code-aware skip);
 PRE-FLIGHT guards (preconditions, tag-unpushed, remote, version-sync, secret-scan);
 journalled rollback; three-layer branch protection; drift guard wired as opt-in pre-push
 hook and/or CI snippet; **beginner-first docs (quickstart + commented walkthrough)**;
