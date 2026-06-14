@@ -1,17 +1,26 @@
 {
   "name": "shipmate",
   "description": "Marketplace for the shipmate release plugin.",
-  "owner": { "name": "Sofiane Conan" },
+  "owner": {
+    "name": "Sofiane Conan"
+  },
   "plugins": [
     {
       "name": "shipmate",
       "source": "./",
       "description": "Cut software releases from Claude Code: curated changelog, nuanced SemVer, multi-version repos. Local-first, no Conventional Commits required.",
-      "version": "0.0.0",
-      "author": { "name": "Sofiane Conan" },
+      "version": "0.1.0",
+      "author": {
+        "name": "Sofiane Conan"
+      },
       "homepage": "https://github.com/sofiane-git/shipmate",
       "license": "MIT",
-      "keywords": ["claude-code", "release-automation", "changelog", "semver"],
+      "keywords": [
+        "claude-code",
+        "release-automation",
+        "changelog",
+        "semver"
+      ],
       "category": "developer-tools"
     }
   ]

@@ -4,6 +4,8 @@ All notable changes to this project will be documented here. Format follows [Kee
 
 ## [Unreleased]
 
+## [0.1.0] — 2026-06-14
+
 ### Added
 - **Foundation**: plugin scaffold, `.shipmate.json` schema, deterministic guard scripts
   (`read-version`, `version-sync-check`, `check-tag-unpushed`, `verify-remote`,
