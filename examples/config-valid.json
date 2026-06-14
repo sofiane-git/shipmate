@@ -1,0 +1,25 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sofiane-git/shipmate/main/schemas/shipmate-config.schema.json",
+  "remote": "origin",
+  "protectedBranch": "main",
+  "primaryContract": "kit",
+  "securityReview": "auto",
+  "contracts": [
+    {
+      "name": "kit",
+      "tag": "v{version}",
+      "bumpFrom": "changelog",
+      "locations": [
+        { "file": "package.json", "json": ".version" }
+      ]
+    },
+    {
+      "name": "schema",
+      "tag": null,
+      "bumpFrom": "manual",
+      "locations": [
+        { "file": "schemas/x.schema.json", "json": ".properties.schemaVersion.const" }
+      ]
+    }
+  ]
+}
