@@ -424,8 +424,14 @@ Requirements:
 ## 11. Testing strategy
 
 - **`bats`** unit tests for every `scripts/*.sh` guard (deterministic → unit-testable).
-- **Skill evals** (via skill-creator) using the `examples/` repos as fixtures: a fixture
-  repo in → expected `.shipmate.json` / expected bump decision out.
+- **skill-creator as the build-time authoring + eval method.** The three `SKILL.md`
+  (`init`/`release`/`verify`) are authored through **skill-creator** to get correct
+  frontmatter, best-practice structure, and — critically — **trigger-description tuning**
+  so the three skills fire on the right phrases without overlapping. It also drives
+  **skill evals** using the `examples/` repos as fixtures: a fixture repo in → expected
+  `.shipmate.json` / expected bump decision out. skill-creator is a build/test tool only —
+  **not** a runtime dependency or a shipmate feature; detailed usage belongs in the
+  implementation plan (writing-plans).
 - **CI (`ci.yml`)**: `shellcheck` all scripts, validate `shipmate-config.schema.json`,
   lint SKILL.md frontmatter, run bats + fixtures. Pin any action by commit SHA. **CI is
   the barrier** (required status checks); the pre-commit hook below is convenience only.
