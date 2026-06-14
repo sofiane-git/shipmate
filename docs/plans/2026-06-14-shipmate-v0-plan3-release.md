@@ -491,7 +491,11 @@ Run, in order, aborting on the first failure:
 4. `version-sync-check.sh .shipmate.json`.
 
 ## State 2 — PLAN (no writes)
-- Determine the diff since the **primaryContract**'s last tag.
+- Determine the diff since the **primaryContract**'s last tag. **If no tag exists yet (a
+  repo's first-ever release), fall back to the diff from the repository's initial commit**
+  (`git rev-list --max-parents=0 HEAD`). The curated `[Unreleased]` drives the notes either
+  way. (Distinct from shipmate's own chicken/egg — consuming repos always have shipmate
+  available; they just lack a prior tag on first release.)
 - Classify the SemVer bump **per contract** using documented nuance (e.g. tightening an
   already-documented contract = PATCH, not MAJOR). Skip `bumpFrom: "manual"` contracts
   unless `--bump <name>` was passed. Present the proposed version(s) + reasoning.

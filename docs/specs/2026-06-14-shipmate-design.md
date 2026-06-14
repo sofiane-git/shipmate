@@ -150,6 +150,10 @@ simple single-version repo; N contracts = the multi-version case. Everything els
   diff in `release` (§7.2). Removes ambiguity when several contracts (or `tag: null`
   contracts) exist. Must reference a **tagged** contract (`tag` ≠ null) — there is no
   "last tag" to diff from otherwise; `init` validates this. (m2)
+  **First release of a repo (no tag yet):** `release` falls back to the diff from the
+  initial commit (`git rev-list --max-parents=0 HEAD`). This applies to **every** repo on
+  its first release, including consuming repos — it is unrelated to shipmate's own
+  chicken/egg bootstrap (§12), which is specific to shipmate releasing itself.
 - **`locations[].json` / `.toml` / `.regex`** — how to read/write the literal.
   - `json` = JSONPath, `toml` = dotted key.
   - `regex` must contain **exactly one capture group**, and that group's span is the
@@ -214,7 +218,8 @@ state up to — but not including — `PUBLISH`, printing the full plan and writ
                  └──────┬──────┘
                         │ all pass
                  ┌──────▼──────┐
-                 │   PLAN      │  diff since primaryContract's last tag (m2);
+                 │   PLAN      │  diff since primaryContract's last tag, or from the
+                 │             │  initial commit if no tag exists yet (first release, m2);
                  │             │  classify SemVer per contract (skip bumpFrom:manual
                  │             │  unless --bump <name>, M1); author curated CHANGELOG;
                  │             │  security review per policy (auto: run /security-review
@@ -487,7 +492,10 @@ Requirements:
 - The existing `protect-main` hook is kept (shipmate can also scaffold it).
 
 shipmate also **dogfoods itself** (shipmate releases shipmate); bootstrap the first tag
-manually (chicken/egg).
+manually (chicken/egg). **This chicken/egg is specific to shipmate** — the tool that cuts
+releases is not yet published at the moment of its own first release. **Consuming repos
+never hit this**: shipmate is already installed when they use it. Their first release just
+has no prior tag, which `release` handles by diffing from the initial commit (§6).
 
 **Repo bootstrap (shipmate's own governance).** Protecting shipmate's `main` is a GitHub
 **settings** step, not a CI-file edit: enable branch protection on `main` and mark the
