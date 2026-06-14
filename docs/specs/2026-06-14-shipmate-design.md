@@ -462,7 +462,7 @@ branch protection references them as required-to-merge. This bootstrap belongs i
 implementation plan, performed once when the GitHub remote is created.
 
 shipmate's own PRs run `/security-review` before merge (documented in `CONTRIBUTING.md`) —
-dogfooding the opt-in review it exposes via `release --security-review`.
+dogfooding the secure-by-default review it exposes via `release` (`securityReview: auto`).
 
 ## 13. Extension points (not built in v0)
 
