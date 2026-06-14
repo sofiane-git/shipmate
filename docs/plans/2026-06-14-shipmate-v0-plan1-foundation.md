@@ -908,7 +908,7 @@ patterns=(
 
 hit=0
 for p in "${patterns[@]}"; do
-  if grep -Eq "$p" <<<"$content"; then
+  if grep -Eq -e "$p" <<<"$content"; then   # -e: patterns may start with '-' (PEM header)
     echo "scan-secrets: matched secret-shaped pattern: /$p/" >&2
     hit=1
   fi
