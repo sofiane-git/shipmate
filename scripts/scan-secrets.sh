@@ -18,6 +18,10 @@ patterns=(
   'AKIA[0-9A-Z]{16}'                    # AWS access key id
   '-----BEGIN [A-Z ]*PRIVATE KEY-----'  # PEM private key
   'xox[baprs]-[A-Za-z0-9-]{10,}'        # Slack token
+  'AIza[0-9A-Za-z_-]{35}'               # Google API key
+  'glpat-[0-9A-Za-z_-]{20}'             # GitLab personal access token
+  'sk_live_[0-9A-Za-z]{24,}'            # Stripe live secret key
+  'npm_[A-Za-z0-9]{36}'                 # npm access token
 )
 
 hit=0
