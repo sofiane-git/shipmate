@@ -311,10 +311,19 @@ For a repo with a `protectedBranch`, `init` offers **three independent, opt-in l
 the same defense-in-depth shipmate's own reference consumer uses:
 
 1. **Local `protect-main` hook** — denies `git commit` / `git push` issued directly on the
-   protected branch (tag-only pushes excepted — see below). First, fastest gate.
-2. **GitHub branch protection** via `gh api` — server-side rejection of direct pushes; the
-   final gate that holds even if the local hook is bypassed.
-3. **CI check** — rejects a PR/push that violates the policy.
+   protected branch (tag-only pushes excepted — see below). First, fastest gate. A hook is
+   bypassable (`--no-verify`); it is a convenience guard, not the real barrier.
+2. **GitHub branch protection** via `gh api` — the **real barrier**: server-side rejection
+   of direct pushes, enforced even if the local hook is bypassed. This layer also declares
+   which CI checks are **required** before a PR can merge.
+3. **Required status checks (CI)** — the consuming repo's CI jobs, *referenced by* layer 2
+   as required-to-merge. A CI run cannot **prevent** a direct push (the push already
+   happened by the time it runs); its role is to gate the **PR merge**, not to block the
+   push. Optionally a workflow can also flag an after-the-fact direct-to-protected commit
+   as a failure (a signal, not a barrier).
+
+Layer 2 is the one that actually enforces; layers 1 and 3 are convenience and merge-gating
+respectively. `init` sets up all three but is explicit about which is the true barrier.
 
 `release` honors this: in PR mode it never commits or tags on the protected branch, works
 on a `release/*` branch, and pushes **only the tag** directly after merge — tags are not
@@ -410,6 +419,12 @@ Requirements:
 
 shipmate also **dogfoods itself** (shipmate releases shipmate); bootstrap the first tag
 manually (chicken/egg).
+
+**Repo bootstrap (shipmate's own governance).** Protecting shipmate's `main` is a GitHub
+**settings** step, not a CI-file edit: enable branch protection on `main` and mark the
+`ci.yml` jobs as **required status checks**. The CI workflow runs the test jobs (§11);
+branch protection references them as required-to-merge. This bootstrap belongs in the
+implementation plan, performed once when the GitHub remote is created.
 
 ## 13. Extension points (not built in v0)
 
