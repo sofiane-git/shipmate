@@ -126,6 +126,7 @@ for c in "${candidates[@]}"; do
 done
 
 # prose markers: `currently `X.Y.Z`` in any tracked .md under the root
+# shellcheck disable=SC2016  # backticks are literal here (a Perl regex, not a shell expansion)
 prose_re='currently `([0-9]+\.[0-9]+\.[0-9]+)`'
 while IFS= read -r md; do
   rel="${md#"$root"/}"
@@ -277,18 +278,19 @@ elif [ "$ptag" = "null" ]; then
   err "primaryContract '$primary' must be a tagged contract (tag != null)"
 fi
 
-# collect rendered tags for uniqueness; validate regex groups + readability
-declare -A seen_tags
+# collect rendered tags for uniqueness (portable: newline list, no associative arrays —
+# macOS ships bash 3.2 which lacks `declare -A`); validate regex groups + readability
+seen_tags=""
 count="$(jq '.contracts | length' "$config")"
 for ((i = 0; i < count; i++)); do
   name="$(jq -r ".contracts[$i].name" "$config")"
   tag="$(jq -r ".contracts[$i].tag // \"null\"" "$config")"
   if [ "$tag" != "null" ]; then
     rendered="${tag//\{name\}/$name}"; rendered="${rendered//\{version\}/0.0.0}"
-    if [ -n "${seen_tags[$rendered]:-}" ]; then
-      err "contracts '$name' and '${seen_tags[$rendered]}' render the same tag '$rendered'"
+    if printf '%s\n' "$seen_tags" | grep -qxF "$rendered"; then
+      err "two tagged contracts render the same tag '$rendered'"
     else
-      seen_tags[$rendered]="$name"
+      seen_tags="$seen_tags"$'\n'"$rendered"
     fi
   fi
 

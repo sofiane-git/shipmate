@@ -1,0 +1,10 @@
+{
+  "remote": "origin",
+  "protectedBranch": "main",
+  "primaryContract": "kit",
+  "securityReview": "auto",
+  "contracts": [
+    { "name": "kit", "tag": "v{version}", "bumpFrom": "changelog",
+      "locations": [ { "file": "pyproject.toml", "toml": "project.version" } ] }
+  ]
+}
