@@ -7,7 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 config="${1:-./.shipmate.json}"
 read_version="$SCRIPT_DIR/read-version.sh"
 [ -f "$config" ] || { echo "validate-config: not found: $config" >&2; exit 2; }
-cfg_dir="$(cd "$(dirname "$config")" && pwd)"
+cfg_dir="$(cd "$(dirname "$config")" && pwd -P)"
 
 errors=0
 err() { echo "validate-config: $*" >&2; errors=1; }
@@ -41,6 +41,20 @@ for ((i = 0; i < count; i++)); do
   lcount="$(jq ".contracts[$i].locations | length" "$config")"
   for ((j = 0; j < lcount; j++)); do
     file="$(jq -r ".contracts[$i].locations[$j].file" "$config")"
+
+    # path containment: repo-relative only, no '..', no symlink escape outside repo root
+    case "$file" in
+      /*)   err "contract '$name': location '$file' must be repo-relative (no absolute path)"; continue ;;
+      *..*) err "contract '$name': location '$file' must not contain '..'"; continue ;;
+    esac
+    if [ -e "$cfg_dir/$file" ]; then
+      real="$(perl -MCwd=realpath -e 'print realpath($ARGV[0])' "$cfg_dir/$file" 2>/dev/null || true)"
+      case "$real/" in
+        "$cfg_dir/"*) : ;;
+        *) err "contract '$name': location '$file' resolves outside the repo root" ;;
+      esac
+    fi
+
     re="$(jq -r ".contracts[$i].locations[$j].regex // empty" "$config")"
     if [ -n "$re" ]; then
       groups="$(RE="$re" perl -e '$n = () = $ENV{RE} =~ /\((?!\?)/g; print $n')"

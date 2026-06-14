@@ -64,6 +64,41 @@ JSON
   [[ "$output" == *"tag"* ]]
 }
 
+@test "fails when a location is an absolute path" {
+  cfg <<'JSON'
+{ "remote":"origin","protectedBranch":"main","primaryContract":"kit",
+  "contracts":[{"name":"kit","tag":"v{version}","bumpFrom":"changelog",
+    "locations":[{"file":"/etc/hostname","json":".version"}]}]}
+JSON
+  run "$SCRIPT" "$TMP/.shipmate.json"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"absolute"* ]]
+}
+
+@test "fails when a location escapes the repo with .." {
+  cfg <<'JSON'
+{ "remote":"origin","protectedBranch":"main","primaryContract":"kit",
+  "contracts":[{"name":"kit","tag":"v{version}","bumpFrom":"changelog",
+    "locations":[{"file":"../outside.json","json":".version"}]}]}
+JSON
+  run "$SCRIPT" "$TMP/.shipmate.json"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *".."* ]]
+}
+
+@test "fails when a symlink resolves outside the repo root" {
+  OUT="$(mktemp)"; echo '{"version":"1.0.0"}' > "$OUT"
+  ln -s "$OUT" "$TMP/link.json"
+  cfg <<'JSON'
+{ "remote":"origin","protectedBranch":"main","primaryContract":"kit",
+  "contracts":[{"name":"kit","tag":"v{version}","bumpFrom":"changelog",
+    "locations":[{"file":"link.json","json":".version"}]}]}
+JSON
+  run "$SCRIPT" "$TMP/.shipmate.json"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"outside"* ]]
+}
+
 @test "fails when a location is unreadable" {
   cfg <<'JSON'
 { "remote":"origin","protectedBranch":"main","primaryContract":"kit",
