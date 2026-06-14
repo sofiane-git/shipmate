@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# shipmate dev pre-commit hook — fast local subset of CI. No husky, no node_modules.
+# Enable with: ./setup-dev.sh
+set -euo pipefail
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+# lint all scripts + hooks
+if command -v shellcheck >/dev/null 2>&1; then
+  shellcheck scripts/*.sh hooks/pre-commit setup-dev.sh
+else
+  echo "pre-commit: shellcheck not installed — skipping (CI still enforces it)" >&2
+fi
+
+# schema validation
+npx -y ajv-cli@5.0.0 validate --spec=draft2020 \
+  -s schemas/shipmate-config.schema.json -d examples/config-valid.json
+
+echo "pre-commit: OK"
