@@ -273,11 +273,17 @@ case "$cmd" in
     ;;
   extract)
     version="${3:?version}"
+    # print the section body, trimming leading/trailing blank lines (portable, no BSD-sed)
     awk -v ver="$version" '
       $0 ~ "^## \\[" ver "\\]" { grab=1; next }
-      grab && /^## \[/ { exit }
-      grab { print }
-    ' "$file" | sed '/^[[:space:]]*$/{ /./!d }'
+      grab && /^## \[/ { stop=1 }
+      grab && !stop { buf[n++]=$0 }
+      END {
+        s=0;   while (s<n   && buf[s] ~ /^[ \t]*$/) s++
+        e=n-1; while (e>=s  && buf[e] ~ /^[ \t]*$/) e--
+        for (i=s; i<=e; i++) print buf[i]
+      }
+    ' "$file"
     ;;
   *)
     echo "changelog-release: unknown subcommand: $cmd" >&2; exit 2 ;;
@@ -468,7 +474,7 @@ Author via **skill-creator**. This is the state machine; it calls Plan-1/2/3 scr
 ````markdown
 ---
 name: release
-description: Cut a release for a shipmate-configured repo — classify the SemVer bump, author the curated changelog, run guards, and after one human checkpoint tag and publish. Use when releasing, cutting a version, shipping a release, or running shipmate release. Flags: --no-pr, --dry-run, --bump <contract>, --security-review/--no-security-review.
+description: Cut a release for a shipmate-configured repo — classify the SemVer bump, author the curated changelog, run guards, and after one human checkpoint tag and publish. Use when releasing, cutting a version, shipping a release, or running shipmate release. Supports --no-pr, --dry-run, --bump, and security-review flags.
 ---
 
 # shipmate:release — cut a release (state machine)
