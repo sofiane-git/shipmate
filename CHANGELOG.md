@@ -18,6 +18,15 @@ All notable changes to this project will be documented here. Format follows [Kee
   page, CONTRIBUTING, SECURITY.
 - shipmate's own `.shipmate.json` (self-dogfood).
 
+### Security
+- **Path containment enforced** (`validate-config.sh`): version locations must be
+  repo-relative — absolute paths, `..`, and symlink escapes outside the repo root are
+  rejected. Makes the "shipmate only writes what you declare" guarantee code-backed.
+- **`scan-secrets.sh` coverage expanded** to Google API keys, GitLab tokens, Stripe live
+  keys, and npm tokens (each with a test).
+
 ### Notes
 - Two-contract flow validated against the real `explain-panel-skills` repo (kit over four
   locations + a `tag: null` schema contract).
+- Pre-release audit: no critical/high vulnerabilities; CI now shellchecks templates and
+  validates example fixtures; added CODE_OF_CONDUCT, issue/PR templates.
