@@ -957,7 +957,7 @@ set -euo pipefail
 repo_root="$(git rev-parse --show-toplevel)"
 cd "$repo_root"
 
-# shellcheck on all scripts + hooks
+# lint all scripts + hooks (do not start this comment with "shellcheck" — parsed as a directive)
 if command -v shellcheck >/dev/null 2>&1; then
   shellcheck scripts/*.sh hooks/pre-commit setup-dev.sh
 else
