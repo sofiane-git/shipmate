@@ -474,7 +474,7 @@ Author via **skill-creator**. This is the state machine; it calls Plan-1/2/3 scr
 ````markdown
 ---
 name: release
-description: Cut a release for a shipmate-configured repo — classify the SemVer bump, author the curated changelog, run guards, and after one human checkpoint tag and publish. Use when releasing, cutting a version, shipping a release, or running shipmate release. Flags: --no-pr, --dry-run, --bump <contract>, --security-review/--no-security-review.
+description: Cut a release for a shipmate-configured repo — classify the SemVer bump, author the curated changelog, run guards, and after one human checkpoint tag and publish. Use when releasing, cutting a version, shipping a release, or running shipmate release. Supports --no-pr, --dry-run, --bump, and security-review flags.
 ---
 
 # shipmate:release — cut a release (state machine)
