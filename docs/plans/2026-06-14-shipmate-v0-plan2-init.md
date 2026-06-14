@@ -126,6 +126,7 @@ for c in "${candidates[@]}"; do
 done
 
 # prose markers: `currently `X.Y.Z`` in any tracked .md under the root
+# shellcheck disable=SC2016  # backticks are literal here (a Perl regex, not a shell expansion)
 prose_re='currently `([0-9]+\.[0-9]+\.[0-9]+)`'
 while IFS= read -r md; do
   rel="${md#"$root"/}"
