@@ -691,7 +691,9 @@ if ! git remote get-url "$remote" >/dev/null 2>&1; then
   echo "verify-remote: no such remote '$remote'" >&2
   exit 1
 fi
-if ! git ls-remote --exit-code "$remote" >/dev/null 2>&1; then
+if ! git ls-remote "$remote" >/dev/null 2>&1; then
+  # note: no --exit-code — reachability means "could contact", refs are optional
+  # (an empty remote has no refs but is still reachable)
   echo "verify-remote: remote '$remote' is not reachable" >&2
   exit 1
 fi
@@ -1049,7 +1051,7 @@ jobs:
         with:
           node-version: '20'
       - name: install bats
-        run: npm install -g bats@1.11.0
+        run: npm install -g bats@1.13.0
       - name: run tests
         run: bats tests
 ```
