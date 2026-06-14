@@ -24,4 +24,6 @@ secure-by-default review it ships).
 From v0.1.1 on, shipmate releases itself with `shipmate:release`.
 
 ## Adding a secret pattern to `scan-secrets.sh`
-Every new pattern needs a matching bats case in `tests/scan-secrets.bats`.
+Every new pattern needs a matching bats case in `tests/scan-secrets.bats`. **Assemble the
+fixture string from parts** (e.g. `printf 'sk_%s_…' 'live'`) so the literal never appears
+in source — otherwise GitHub push protection (and other scanners) will flag your own test.
